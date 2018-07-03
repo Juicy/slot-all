@@ -22,12 +22,18 @@
                 const slotAll = this;
 
                 // host observer instance
-                this._hostObserver = new MutationObserver((mutationsList)=>{
+                function mutationCallback(mutationsList){
                     for(var mutation of mutationsList) {
                         mutation.addedNodes.length && slotAll._createSlots(mutation.addedNodes);
                         mutation.removedNodes.length && slotAll._removeSlots(mutation.removedNodes);
                     }
-                });
+                }
+                // ShadyDOM breaks mutation observer, so we need to use its non-standard API
+                if(window.ShadyDOM && ShadyDOM.observeChildren){
+                    this.__shadyMutationCallback = mutationCallback;
+                } else {
+                    this._hostObserver = new MutationObserver(mutationCallback);
+                }
                 // map of created named slots
                 this.__createdSlots = new Map();
             }
@@ -38,7 +44,11 @@
             connectedCallback(){
                 const host = this.getRootNode().host;
                 // Start observing the shadow host for child list changes
-                this._hostObserver.observe(host, { childList: true });
+                if(window.ShadyDOM && this.__shadyMutationCallback){
+                    this.__shadyObserver = ShadyDOM.observeChildren(host, this.__shadyMutationCallback);
+                } else {
+                    this._hostObserver.observe(host, { childList: true });
+                }
                 // Create slots for initial list of children
                 this._createSlots(Array.from(host.children));
             }
@@ -46,7 +56,10 @@
              * Disconnect host observer, remove created slots, clear the slots map.
              */
             disconnectedCallback(){
+                // unobserve host changes
                 this._hostObserver && this._hostObserver.disconnect();
+                // unobserve shady dom host changes
+                this.__shadyObserver && ShadyDOM.unobserveChildren(this.__shadyObserver);
                 for(let [name, slot] of this.__createdSlots){
                     slot.remove();
                 }
