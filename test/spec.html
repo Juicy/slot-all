@@ -16,6 +16,11 @@
                 this.attachShadow({mode: 'open'}).innerHTML = `<div id="scope"><slot-all></slot-all></div>`;
             }
         });
+        /** workaround for ShadyDOM bug https://github.com/webcomponents/shadydom/issues/255 */
+        function querySelectorChildren(root, parent, simpleSelector){
+            return Array.from(root.querySelector(parent).children)
+                .filter(el => el.matches(simpleSelector));
+        }
     </script>
 </head>
 
@@ -46,12 +51,10 @@
         });
 
         it('should create `slot` elements for all slot names used by host\'s children, and `all-slotted` attribute to them', function() {
-            debugger
-            expect(host.shadowRoot.querySelector(`#scope > slot[name][all-slotted]`)).to.be.not.null;
-            expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+            expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             Array.from(host.children).forEach((child)=>{
                 child.hasAttribute('slot') &&
-                expect(host.shadowRoot.querySelector(`#scope > slot[name="${child.getAttribute('slot')}"][all-slotted]`)).to.be.not.null;
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="${child.getAttribute('slot')}"][all-slotted]`)).to.have.lengthOf(1);
             });
         });
 
@@ -66,7 +69,7 @@
             });
 
             it('should create `slot` element for it', function() {
-                expect(host.shadowRoot.querySelector(`#scope > slot[name="name3"][all-slotted]`)).to.be.not.null;
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name3"][all-slotted]`)).to.have.lengthOf(1);
             });
         });
 
@@ -81,7 +84,7 @@
             });
 
             it('should NOT create `slot` element for it', function() {
-                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+                expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             });
         });
 
@@ -95,7 +98,7 @@
             });
 
             it('should NOT create `slot` element for it', function() {
-                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+                expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             });
         });
 
@@ -109,8 +112,8 @@
             });
 
             it('should remove respective  `slot` element', function() {
-                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(1);
-                expect(host.shadowRoot.querySelector(`#scope > slot[name="name2"]`)).to.be.null;
+                expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.length(1);
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name2"]`)).to.be.empty;
             });
         });
         describe('when an element with non-unique slot name is removed (one from a group)', function() {
@@ -122,9 +125,9 @@
             });
 
             it('should NOT remove any  `slot` element', function() {
-                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
-                expect(host.shadowRoot.querySelector(`#scope > slot[name="name2"]`)).to.be.not.null;
-                expect(host.shadowRoot.querySelector(`#scope > slot[name="name"]`)).to.be.not.null;
+                expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name2"]`)).to.have.lengthOf(1);
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name"]`)).to.have.lengthOf(1);
             });
         });
         describe('when `slot-all` element is removed', function() {
@@ -142,9 +145,9 @@
             });
 
             it('should remove all created `slot` elements (without removing other slots)', function() {
-                expect(host.shadowRoot.querySelector(`#scope > slot[name][all-slotted]`)).to.be.null;
-                expect(host.shadowRoot.querySelector(`#scope > slot:not([name])`)).to.be.not.null;
-                expect(host.shadowRoot.querySelector(`#scope > slot[name="foo"]`)).to.be.not.null;
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name][all-slotted]`)).to.be.empty;
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot:not([name])`)).to.have.lengthOf(1);
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="foo"]`)).to.have.lengthOf(1);
             });
         });
 
