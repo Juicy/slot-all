@@ -40,6 +40,10 @@ Or [download as ZIP](https://github.com/Juicy/slot-all/archive/master.zip).
     </div>
     ```
 
+## Caveats
+
+WebComponentsJS polyfill does ignore `node.remove()` calls, meaning it cannot be observed or reflected in shadow root. This result in `slot-all` element being unable to react on child nodes removed using this method. If you are targeting polyfilled environments try using `node.parentNode.removeChild(node)`. 
+
 ## [Contributing and Development](CONTRIBUTING.md)
 
 ## History

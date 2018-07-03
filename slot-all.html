@@ -61,7 +61,9 @@
                 // unobserve shady dom host changes
                 this.__shadyObserver && ShadyDOM.unobserveChildren(this.__shadyObserver);
                 for(let [name, slot] of this.__createdSlots){
-                    slot.remove();
+                    // WC polyfill does not support .remove()
+                    // slot.remove();
+                    slot.parentNode && slot.parentNode.removeChild(slot);
                 }
                 this.__createdSlots.clear();
             }
@@ -119,7 +121,9 @@
                         // as we assume to support only names slots => elements
                         // if(slot && slot.assignedElements().length == 0){
                         if(slot && slot.assignedNodes().length == 0){
-                            slot.remove();
+                            // WC polyfill does not support .remove()
+                            // slot.remove();
+                            slot.parentNode.removeChild(slot);
                             __createdSlots.delete(slot);
                         }
                     }
