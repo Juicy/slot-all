@@ -57,7 +57,8 @@
                 expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="${child.getAttribute('slot')}"][all-slotted]`)).to.have.lengthOf(1);
             });
         });
-
+        console.warn(`The elements added using \`insertAdjacentElement\` may not be detected in polyfilled browsers due to polyfill bug
+            https://github.com/webcomponents/shadydom/issues/263`);
         describe('when new element with new slot name is added', function() {
             beforeEach(function(done) {
                 const newEl = document.createElement('div');
@@ -106,6 +107,7 @@
         describe('when an element with unique slot name is removed (the last of the same name)', function() {
             beforeEach(function(done) {
                 const removedEl = host.querySelector('[slot="name2"]');
+                // Workaround https://github.com/webcomponents/shadydom/issues/261
                 // WC.js polyfill does not support
                 // removedEl.remove();
                 removedEl.parentNode.removeChild(removedEl);
@@ -116,7 +118,8 @@
             if(window.ShadyDOM){
                 console.warn(`Slots may not be removed due to polyfill bugs:
                 https://github.com/webcomponents/shadydom/issues/260,
-                https://github.com/webcomponents/shadydom/issues/261`);
+                https://github.com/webcomponents/shadydom/issues/261,
+                https://github.com/webcomponents/shadydom/issues/262`);
             }
             it('should remove respective  `slot` element', function() {
                 expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.length(1);
@@ -126,6 +129,7 @@
         describe('when an element with non-unique slot name is removed (one from a group)', function() {
             beforeEach(function(done) {
                 const removedEl = host.querySelector('[slot="name"]');
+                // Workaround https://github.com/webcomponents/shadydom/issues/261
                 // WC.js polyfill does not support
                 // removedEl.remove();
                 removedEl.parentNode.removeChild(removedEl);
@@ -148,18 +152,10 @@
                 namedSlot.setAttribute('name', 'foo');
                 root.appendChild(namedSlot);
                 const slotAll = root.querySelector('slot-all');
-                // WC.js polyfill does not support
-                // slotAll.remove();
-                slotAll.parentNode.removeChild(slotAll);
+                slotAll.remove();
                 // wait for mutation observer
                 setTimeout(done, 0);
             });
-
-            if(window.ShadyDOM){
-                console.warn(`Slots may not be removed due to polyfill bugs:
-                https://github.com/webcomponents/shadydom/issues/260,
-                https://github.com/webcomponents/shadydom/issues/261`);
-            }
             it('should remove all created `slot` elements (without removing other slots)', function() {
                 expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name][all-slotted]`)).to.be.empty;
                 expect(querySelectorChildren(host.shadowRoot, '#scope', `slot:not([name])`)).to.have.lengthOf(1);

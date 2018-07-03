@@ -29,6 +29,7 @@
                     }
                 }
                 // ShadyDOM breaks mutation observer, so we need to use its non-standard API
+                // workaround https://github.com/webcomponents/shadydom/issues/260
                 if(window.ShadyDOM && ShadyDOM.observeChildren){
                     this.__shadyMutationCallback = mutationCallback;
                 } else {
@@ -44,6 +45,7 @@
             connectedCallback(){
                 const host = this.getRootNode().host;
                 // Start observing the shadow host for child list changes
+                // workaround https://github.com/webcomponents/shadydom/issues/260
                 if(window.ShadyDOM && this.__shadyMutationCallback){
                     this.__shadyObserver = ShadyDOM.observeChildren(host, this.__shadyMutationCallback);
                 } else {
@@ -59,8 +61,10 @@
                 // unobserve host changes
                 this._hostObserver && this._hostObserver.disconnect();
                 // unobserve shady dom host changes
+                // workaround https://github.com/webcomponents/shadydom/issues/260
                 this.__shadyObserver && ShadyDOM.unobserveChildren(this.__shadyObserver);
                 for(let [name, slot] of this.__createdSlots){
+                    // workaround https://github.com/webcomponents/shadydom/issues/262
                     // WC polyfill does not support .remove()
                     // slot.remove();
                     slot.parentNode && slot.parentNode.removeChild(slot);
@@ -95,6 +99,7 @@
                         slotsMap.set(name, namedSlot);
                         // following is not supported by polyfill
                         // slotAll.insertAdjacentElement('beforebegin', namedSlot);
+                        // workaround https://github.com/webcomponents/shadydom/issues/263
                         slotAll.parentNode.insertBefore(namedSlot, slotAll);
                     }
                 });
@@ -121,6 +126,7 @@
                         // as we assume to support only names slots => elements
                         // if(slot && slot.assignedElements().length == 0){
                         if(slot && slot.assignedNodes().length == 0){
+                            // workaround https://github.com/webcomponents/shadydom/issues/262
                             // WC polyfill does not support .remove()
                             // slot.remove();
                             slot.parentNode.removeChild(slot);
