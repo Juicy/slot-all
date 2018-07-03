@@ -1,9 +1,9 @@
 {
-  "name": "juicy-element",
+  "name": "slot-all",
   "version": "0.0.0",
-  "description": "Awesome, Juicy Custom Element",
+  "description": "A custom element to distribute all elements regardless of their slot name",
   "license": "MIT",
-  "main": "juicy-element.html",
+  "main": "slot-all.html",
   "keywords": [
     "web-components",
     "juicy"

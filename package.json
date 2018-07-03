@@ -1,8 +1,8 @@
 {
-  "name": "juicy-element",
+  "name": "slot-all",
   "version": "0.0.0",
-  "description": "Awesome, Juicy Custom Element",
-  "main": "juicy-element.html",
+  "description": "A custom element to distribute all elements regardless of their slot name",
+  "main": "slot-all.html",
   "directories": {
     "test": "test"
   },
@@ -17,10 +17,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Juicy/juicy-element"
+    "url": "https://github.com/Juicy/slot-all"
   },
   "bugs": {
-    "url": "https://github.com/Juicy/juicy-element/issues"
+    "url": "https://github.com/Juicy/slot-all/issues"
   },
   "license": "MIT"
 }

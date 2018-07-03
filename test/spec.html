@@ -8,28 +8,146 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../juicy-element.html">
+    <link rel="import" href="../slot-all.html">
+    <script>
+        customElements.define('shadow-host', class extends HTMLElement{
+            constructor(){
+                super();
+                this.attachShadow({mode: 'open'}).innerHTML = `<div id="scope"><slot-all></slot-all></div>`;
+            }
+        });
+    </script>
 </head>
 
 <body>
-    <test-fixture id="element">
+    <test-fixture id="shadow-host">
         <template>
-            <juicy-element></juicy-element>
+            <shadow-host>
+                <div slot="name">Div slotted by name</div>
+                <div slot="name">Div2 slotted by name</div>
+                <div slot="name2">Div slotted by name2</div>
+                <div>default</div>
+            </shadow-host>
         </template>
     </test-fixture>
 </body>
 <script>
-    var juicyElement;
-    describe('juicy-element', function() {
-
-        beforeEach(function() {
-            juicyElement = fixture('element');
+    describe('slot-all when used in shadow root', function() {
+        var host;
+        beforeEach(function(done) {
+            host = fixture('shadow-host');
+            // Ensure Shadow DOM distribution
+            flush(done);
         });
 
         it('should be upgraded element', function() {
-            expect(customElements.get('juicy-element')).to.be.defined;
-            expect(juicyElement).to.be.an.instanceOf(customElements.get('juicy-element'));
+            expect(customElements.get('slot-all')).to.be.defined;
+            expect(host.shadowRoot.querySelector('slot-all')).to.be.an.instanceOf(customElements.get('slot-all'));
         });
+
+        it('should create `slot` elements for all slot names used by host\'s children, and `all-slotted` attribute to them', function() {
+            debugger
+            expect(host.shadowRoot.querySelector(`#scope > slot[name][all-slotted]`)).to.be.not.null;
+            expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+            Array.from(host.children).forEach((child)=>{
+                child.hasAttribute('slot') &&
+                expect(host.shadowRoot.querySelector(`#scope > slot[name="${child.getAttribute('slot')}"][all-slotted]`)).to.be.not.null;
+            });
+        });
+
+        describe('when new element with new slot name is added', function() {
+            beforeEach(function(done) {
+                const newEl = document.createElement('div');
+                newEl.setAttribute('slot','name3');
+                newEl.innerHTML = 'Div slotted by name3';
+                host.appendChild(newEl);
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should create `slot` element for it', function() {
+                expect(host.shadowRoot.querySelector(`#scope > slot[name="name3"][all-slotted]`)).to.be.not.null;
+            });
+        });
+
+        describe('when new element with existing slot name is added', function() {
+            beforeEach(function(done) {
+                const newEl = document.createElement('div');
+                newEl.setAttribute('slot','name');
+                newEl.innerHTML = 'Div3 slotted by name';
+                host.appendChild(newEl);
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should NOT create `slot` element for it', function() {
+                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+            });
+        });
+
+        describe('when new element with no slot name is added', function() {
+            beforeEach(function(done) {
+                const newEl = document.createElement('div');
+                newEl.innerHTML = 'default2';
+                host.appendChild(newEl);
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should NOT create `slot` element for it', function() {
+                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+            });
+        });
+
+
+        describe('when an element with unique slot name is removed (the last of the same name)', function() {
+            beforeEach(function(done) {
+                const removedEl = host.querySelector('[slot="name2"]');
+                removedEl.remove();
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should remove respective  `slot` element', function() {
+                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(1);
+                expect(host.shadowRoot.querySelector(`#scope > slot[name="name2"]`)).to.be.null;
+            });
+        });
+        describe('when an element with non-unique slot name is removed (one from a group)', function() {
+            beforeEach(function(done) {
+                const removedEl = host.querySelector('[slot="name"]');
+                removedEl.remove();
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should NOT remove any  `slot` element', function() {
+                expect(host.shadowRoot.querySelectorAll(`#scope > slot[name][all-slotted]`)).to.have.length(2);
+                expect(host.shadowRoot.querySelector(`#scope > slot[name="name2"]`)).to.be.not.null;
+                expect(host.shadowRoot.querySelector(`#scope > slot[name="name"]`)).to.be.not.null;
+            });
+        });
+        describe('when `slot-all` element is removed', function() {
+            beforeEach(function(done) {
+                const root = host.shadowRoot.querySelector('#scope');
+                const defaultSlot = document.createElement('slot');
+                root.appendChild(defaultSlot);
+                const namedSlot = document.createElement('slot');
+                namedSlot.setAttribute('name', 'foo');
+                root.appendChild(namedSlot);
+                const slotAll = root.querySelector('slot-all');
+                slotAll.remove();
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should remove all created `slot` elements (without removing other slots)', function() {
+                expect(host.shadowRoot.querySelector(`#scope > slot[name][all-slotted]`)).to.be.null;
+                expect(host.shadowRoot.querySelector(`#scope > slot:not([name])`)).to.be.not.null;
+                expect(host.shadowRoot.querySelector(`#scope > slot[name="foo"]`)).to.be.not.null;
+            });
+        });
+
     });
 </script>
 
