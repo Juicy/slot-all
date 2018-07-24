@@ -50,7 +50,7 @@
             expect(host.shadowRoot.querySelector('slot-all')).to.be.an.instanceOf(customElements.get('slot-all'));
         });
 
-        it('should create `slot` elements for all slot names used by host\'s children, and `all-slotted` attribute to them', function() {
+        it('should create `slot` elements for all slot names used by host\'s children, and add `all-slotted` attribute to them', function() {
             expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             Array.from(host.children).forEach((child)=>{
                 child.hasAttribute('slot') &&

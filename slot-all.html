@@ -106,7 +106,7 @@
             }
             /**
              * Remove slots for given elements, if needed:
-             *  - there is no more host's children with a slot name for given slot name
+             *  - there are no more host's children with a slot name for the given slot name
              * @param  {NodeList|HTMLCollection} nodeList list of removed host's children
              */
             _removeSlots(nodeList){
@@ -121,7 +121,7 @@
                         // if host still has the elements with the same slot name,
                         // we should keep the slot
                         const slot = __createdSlots.get(slotName);
-                        // Polyfileld browsers does not have assignedElements
+                        // Polyfilled browsers do not have assignedElements
                         // this time assignedNodes is somewhat safe to use
                         // as we assume to support only names slots => elements
                         // if(slot && slot.assignedElements().length == 0){

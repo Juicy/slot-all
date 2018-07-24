@@ -82,7 +82,7 @@
     </div>
 
 
-    <h4>Looking for a more specs? Check out the <a href="test/">test suite</a>.</h4>
+    <h4>Looking for more specs? Check out the <a href="test/">test suite</a>.</h4>
 
 
 </body>
@@ -105,7 +105,7 @@
     // bound editor to the example
     document.querySelector('juicy-ace-editor').addEventListener('change', (ev)=>{
         document.querySelector('[shadow-host]').innerHTML = ev.target.value;
-        // trick Ace editor to adatpt to the new content
+        // trick Ace editor to adapt to the new content
         window.dispatchEvent(new Event('resize'));
         applyDSD();
     });

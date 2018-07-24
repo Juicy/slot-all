@@ -44,7 +44,7 @@ Or [download as ZIP](https://github.com/Juicy/slot-all/archive/master.zip).
 
 WebComponentsJS Shadow DOM polyfill has some limitations.
 It does ignore `node.remove()` and `.insertAdjacentElement()` calls,
-meaning it cannot be observed or reflected in shadow root. This result in `slot-all` element being unable to react on child nodes been added or removed using this methods. If you are targeting polyfilled environments try using `node.parentNode.removeChild(node)` and `insertBefore`.
+meaning it cannot be observed or reflected in shadow root. This result in `slot-all` element being unable to react on child nodes been added or removed using these methods. If you are targeting polyfilled environments try using `node.parentNode.removeChild(node)` and `insertBefore`.
 See issues https://github.com/webcomponents/shadydom/issues/260, https://github.com/webcomponents/shadydom/issues/261, https://github.com/webcomponents/shadydom/issues/262, https://github.com/webcomponents/shadydom/issues/263.
 
 ## [Contributing and Development](CONTRIBUTING.md)
