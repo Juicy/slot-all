@@ -1,22 +1,20 @@
-# &lt;juicy-element&gt;
+# &lt;slot-all&gt;
 
-> A bare minimum custom element starter-kit using [VanillaJS](http://vanilla-js.com/).
->
-> Looking for a working example? Check [hello-world-element](https://github.com/webcomponents/hello-world-element).
+A custom element to distribute all elements regardless of their slot name
 
 ## Demo
 
-[Check it live!](http://Juicy.github.io/juicy-element)
+[Check it live!](http://Juicy.github.io/slot-all)
 
 ## Install
 
 Install the component using [Bower](http://bower.io/):
 
 ```sh
-$ bower install juicy-element --save
+$ bower install slot-all --save
 ```
 
-Or [download as ZIP](https://github.com/Juicy/juicy-element/archive/master.zip).
+Or [download as ZIP](https://github.com/Juicy/slot-all/archive/master.zip).
 
 ## Usage
 
@@ -29,44 +27,31 @@ Or [download as ZIP](https://github.com/Juicy/juicy-element/archive/master.zip).
 2. Import custom element:
 
     ```html
-    <link rel="import" href="bower_components/juicy-element/juicy-element.html">
+    <link rel="import" href="bower_components/slot-all/slot-all.html">
     ```
 
 3. Start using it!
 
     ```html
-    <juicy-element></juicy-element>
+    <div>
+        #shadow-root
+            <slot-all></slot-all>
+        <div slot="foo">Named slot</div>
+    </div>
     ```
 
-## Options
+## Caveats
 
-Attribute     | Options     | Default      | Description
----           | ---         | ---          | ---
-`foo`         | *string*    | `bar`        | Lorem ipsum dolor.
-
-## Methods
-
-Method        | Parameters   | Returns     | Description
----           | ---          | ---         | ---
-`unicorn()`   | None.        | Nothing.    | Magic stuff appears.
-
-## Events
-
-Event         | Description
----           | ---
-`onsomething` | Triggers when something happens.
-
-## CSS Custom Properties
-
-Name                          | Description
----                           | ---
-`--juicy-element-laser-color` | Color of the shooted lasers.
+WebComponentsJS Shadow DOM polyfill has some limitations.
+It does ignore `node.remove()` and `.insertAdjacentElement()` calls,
+meaning it cannot be observed or reflected in shadow root. This result in `slot-all` element being unable to react on child nodes been added or removed using these methods. If you are targeting polyfilled environments try using `node.parentNode.removeChild(node)` and `insertBefore`.
+See issues https://github.com/webcomponents/shadydom/issues/260, https://github.com/webcomponents/shadydom/issues/261, https://github.com/webcomponents/shadydom/issues/262, https://github.com/webcomponents/shadydom/issues/263.
 
 ## [Contributing and Development](CONTRIBUTING.md)
 
 ## History
 
-For detailed changelog, check [Releases](https://github.com/Juicy/juicy-element/releases).
+For detailed changelog, check [Releases](https://github.com/Juicy/slot-all/releases).
 
 ## License
 
