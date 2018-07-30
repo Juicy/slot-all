@@ -102,6 +102,25 @@
                 expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             });
         });
+        describe('when a document fragment with a batch of new elements is added', function() {
+            beforeEach(function(done) {
+                const fragment = document.createDocumentFragment();
+                ['name3', 'name4'].forEach((name)=>{
+                    const newEl = document.createElement('div');
+                    newEl.setAttribute('slot', name);
+                    newEl.innerHTML = 'Div slotted by '+ name;
+                    fragment.appendChild(newEl);
+                });
+                host.appendChild(fragment);
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should create `slot` element for them', function() {
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name3"][all-slotted]`)).to.have.lengthOf(1);
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name4"][all-slotted]`)).to.have.lengthOf(1);
+            });
+        });
 
 
         describe('when an element with unique slot name is removed (the last of the same name)', function() {
