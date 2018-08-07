@@ -50,6 +50,10 @@
             expect(host.shadowRoot.querySelector('slot-all')).to.be.an.instanceOf(customElements.get('slot-all'));
         });
 
+        it('should be non visible (`display:none;`) element', function() {
+            expect(window.getComputedStyle(host.shadowRoot.querySelector('slot-all')).getPropertyValue('display')).to.equal('none', 'its `display` computed style property should be `none`');
+        });
+
         it('should create `slot` elements for all slot names used by host\'s children, and add `all-slotted` attribute to them', function() {
             expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             Array.from(host.children).forEach((child)=>{
