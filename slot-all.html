@@ -93,11 +93,10 @@
                     if(
                         element.nodeType === Node.ELEMENT_NODE &&
                         element.hasAttribute('slot') &&
-                        !slotsMap.has(name)
-                        // we do create a slot for elements already
-                        // assigned by other `slot(-all)`s
-                        // to handle distribution when others are removed.
-                        // !element.assignedSlot
+                        !slotsMap.has(name) &&
+                        // do not distribute already distributed elements,
+                        // once the other slot is removed this element will not add it
+                        !element.assignedSlot
                     ){
                         const namedSlot = document.createElement('slot');
                         namedSlot.setAttribute('name', name);
