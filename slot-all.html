@@ -45,6 +45,12 @@
             connectedCallback(){
                 // force it to be non-displayed element
                 this.style.display = 'none';
+                
+                // Do nothing if elements is already disconnected
+                // https://github.com/whatwg/html/pull/4127/files#diff-36cd38f49b9afa08222c0dc9ebfe35ebR67065
+                if(!this.isConnected){
+                    return ;
+                }
                 const host = this.getRootNode().host;
                 // Start observing the shadow host for child list changes
                 // workaround https://github.com/webcomponents/shadydom/issues/260
