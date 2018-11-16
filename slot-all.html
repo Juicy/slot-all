@@ -86,6 +86,13 @@
              * @param  {NodeList|HTMLCollection} nodeList list of host's children or document fragments with children
              */
             _createSlots(nodeList){
+                // Ensure shadow dom distribution is completed in polyfilled browsers
+                // window.ShadyDOM && window.ShadyDOM.flush();
+                // Trick Polymer to render this shadow tree to make `assignedSlot` of element accessible.
+                // it's cheaper than the code above, as flushes only this tree
+                // https://github.com/webcomponents/shadydom/issues/295
+                window.ShadyDOM && window.ShadyDOM.inUse && this.assignedSlot;
+
                 const slotAll = this;
                 const slotsMap = slotAll.__createdSlots;
 
