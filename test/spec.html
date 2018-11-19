@@ -13,7 +13,7 @@
         customElements.define('shadow-host', class extends HTMLElement{
             constructor(){
                 super();
-                this.attachShadow({mode: 'open'}).innerHTML = `<div id="scope"><slot-all></slot-all></div>`;
+                this.attachShadow({mode: 'open'}).innerHTML = `<div id="scope"><slot name="used"></slot><slot-all></slot-all></div>`;
             }
         });
         /** workaround for ShadyDOM bug https://github.com/webcomponents/shadydom/issues/255 */
@@ -31,6 +31,7 @@
                 <div slot="name">Div slotted by name</div>
                 <div slot="name">Div2 slotted by name</div>
                 <div slot="name2">Div slotted by name2</div>
+                <div slot="used">Div already slotted by used</div>
                 <div>default</div>
             </shadow-host>
         </template>
@@ -57,7 +58,7 @@
         it('should create `slot` elements for all slot names used by host\'s children, and add `all-slotted` attribute to them', function() {
             expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
             Array.from(host.children).forEach((child)=>{
-                child.hasAttribute('slot') &&
+                child.hasAttribute('slot') && child.getAttribute("slot") !== "used" &&
                 expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="${child.getAttribute('slot')}"][all-slotted]`)).to.have.lengthOf(1);
             });
         });
@@ -164,6 +165,31 @@
                 expect(querySelectorChildren(host.shadowRoot,`#scope`, `slot[name][all-slotted]`)).to.have.lengthOf(2);
                 expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name2"]`)).to.have.lengthOf(1);
                 expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name"]`)).to.have.lengthOf(1);
+            });
+        });
+        describe('when native `slot` is added for an element(s) distributed by `slot-all`', function() {
+            beforeEach(function(done) {
+                const newSlot = document.createElement('slot');
+                newSlot.setAttribute('name','name');
+                host.shadowRoot.appendChild(newSlot);
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should not remove already created `slot` for this element(s)', function() {
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="name"][all-slotted]`)).to.have.lengthOf(1);
+            });
+        });
+        describe('when native `slot` is removed for an element(s) distributed by `slot-all`', function() {
+            beforeEach(function(done) {
+                const nativeSlot = host.shadowRoot.querySelector('slot[name="used"]');
+                nativeSlot.parentNode.removeChild(nativeSlot);
+                // wait for mutation observer
+                setTimeout(done, 0);
+            });
+
+            it('should NOT add new `slot` for this element(s)', function() {
+                expect(querySelectorChildren(host.shadowRoot, '#scope', `slot[name="used"][all-slotted]`)).to.have.lengthOf(0);
             });
         });
         describe('when `slot-all` element is removed', function() {
