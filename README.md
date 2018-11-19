@@ -49,7 +49,7 @@ meaning it cannot be observed or reflected in shadow root. This result in `slot-
 See issues https://github.com/webcomponents/shadydom/issues/260, https://github.com/webcomponents/shadydom/issues/261, https://github.com/webcomponents/shadydom/issues/262, https://github.com/webcomponents/shadydom/issues/263.
 
 ## NOT observing slots in runtime
-This custom element creates slots when once connected and observes host's children. But it does **not observe other slot elements** in the same tree. Meaning, if you will add or remove some slot elements after `<slot-all>` did its job, the element will not correct the list of its slots. For example
+This custom element creates slots once it's connected and observes host's children. But it does **not observe other slot elements** in the same tree. Meaning, if you add or remove some slot elements after `<slot-all>` did its job, the element will not correct the list of its slots. For example
 ```
 <div slot="foo">Foo</div>
 <div slot="bar">Bar</div>
